@@ -19,3 +19,5 @@ protoc `
 ```
 go get github.com/aws/aws-sdk-go-v2@v1.23.0 github.com/aws/aws-sdk-go-v2/config@v1.18.0 github.com/aws/aws-sdk-go-v2/service/dynamodb@v1.21.0; go mod tidy
 ```
+
+go get github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue

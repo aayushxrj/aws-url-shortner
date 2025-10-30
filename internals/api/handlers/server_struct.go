@@ -1,7 +1,7 @@
 package handlers
 
-import pb "github.com/aayushxrj/aws-url-shortner/proto/gen"
+// import pb "github.com/aayushxrj/aws-url-shortner/proto/gen"
 
-type Server struct {
-	pb.UnimplementedUrlShortenerServer
-}
+// type Server struct {
+// 	pb.UnimplementedUrlShortenerServer
+// }

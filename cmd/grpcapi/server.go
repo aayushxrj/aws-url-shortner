@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/aayushxrj/aws-url-shortner/internals/api/handlers"
+	"github.com/aayushxrj/aws-url-shortner/internals/repository/db"
 	pb "github.com/aayushxrj/aws-url-shortner/proto/gen"
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
@@ -26,10 +27,16 @@ func main() {
 
 	//TODO
 	// Connect Database
-
+	client, err := db.NewDynamoClient()
+	if err != nil {
+		log.Fatal("Error:", err)
+	}
+	fmt.Println("✅ Connected to DynamoDB successfully!", client.DB)
+	
 	s := grpc.NewServer()
 
-	pb.RegisterUrlShortenerServer(s, &handlers.Server{})
+	// pb.RegisterUrlShortenerServer(s, &handlers.Server{})
+	pb.RegisterUrlShortenerServer(s, &handlers.Server{DB: client})
 
 	reflection.Register(s)
 
