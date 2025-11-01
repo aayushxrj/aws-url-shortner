@@ -9,7 +9,7 @@ import (
 	"github.com/aayushxrj/aws-url-shortner/internals/api/handlers"
 	"github.com/aayushxrj/aws-url-shortner/internals/repository/db"
 	pb "github.com/aayushxrj/aws-url-shortner/proto/gen"
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -17,10 +17,10 @@ import (
 func main() {
 
 	// Load env
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	log.Fatalf("Error loading .env file: %v", err)
+	// }
 
 	//TODO
 	// Implement TLS

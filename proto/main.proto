@@ -13,7 +13,26 @@ service UrlShortener {
 
   // Increment click counter whenever a short link is used
   rpc IncrementClick (IncrementClickRequest) returns (IncrementClickResponse);
+
+  // ✅ New RPC: Health check endpoint
+  rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse);
+
+  // ✅ New RPC: Get analytics and metadata for a specific URL
+  rpc GetURLStats (GetURLStatsRequest) returns (GetURLStatsResponse);
+
+  // ✅ New RPC: Update an existing short URL (change destination or expiry)
+  rpc UpdateURL (UpdateURLRequest) returns (UpdateURLResponse);
+
+  // ✅ New RPC: Delete a short URL by ID
+  rpc DeleteURL (DeleteURLRequest) returns (DeleteURLResponse);
+
+  // ✅ New RPC: List all shortened URLs (with optional pagination)
+  rpc ListAllURLs (ListAllURLsRequest) returns (ListAllURLsResponse);
 }
+
+//////////////////////
+// Existing messages
+//////////////////////
 
 message ShortenURLRequest {
   string original_url = 1;  
@@ -41,4 +60,69 @@ message IncrementClickRequest {
 
 message IncrementClickResponse {
   int64 clicks = 1;
+}
+
+//////////////////////
+// New message types
+//////////////////////
+
+// Health Check
+message HealthCheckRequest {}
+message HealthCheckResponse {
+  string status = 1; // e.g. "ok"
+}
+
+// GetURLStats
+message GetURLStatsRequest {
+  string short_id = 1;
+}
+
+message GetURLStatsResponse {
+  string short_id = 1;
+  string original_url = 2;
+  int64 clicks = 3;
+  string created_at = 4;
+  int64 expire_at = 5;
+}
+
+// UpdateURL
+message UpdateURLRequest {
+  string short_id = 1;
+  string new_original_url = 2;
+  int64 new_expire_in_seconds = 3;
+}
+
+message UpdateURLResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// DeleteURL
+message DeleteURLRequest {
+  string short_id = 1;
+}
+
+message DeleteURLResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// ListAllURLs
+message ListAllURLsRequest {
+  int32 limit = 1;
+  string last_evaluated_key = 2; // Optional for pagination
+}
+
+message ListAllURLsResponse {
+  repeated UrlItem urls = 1;
+  string last_evaluated_key = 2;
+}
+
+// Shared structure for URL details
+message UrlItem {
+  string short_id = 1;
+  string original_url = 2;
+  string created_at = 3;
+  int64 expire_at = 4;
+  int64 clicks = 5;
 }

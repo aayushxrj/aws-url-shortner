@@ -22,6 +22,11 @@ const (
 	UrlShortener_ShortenURL_FullMethodName     = "/main.UrlShortener/ShortenURL"
 	UrlShortener_GetOriginalURL_FullMethodName = "/main.UrlShortener/GetOriginalURL"
 	UrlShortener_IncrementClick_FullMethodName = "/main.UrlShortener/IncrementClick"
+	UrlShortener_HealthCheck_FullMethodName    = "/main.UrlShortener/HealthCheck"
+	UrlShortener_GetURLStats_FullMethodName    = "/main.UrlShortener/GetURLStats"
+	UrlShortener_UpdateURL_FullMethodName      = "/main.UrlShortener/UpdateURL"
+	UrlShortener_DeleteURL_FullMethodName      = "/main.UrlShortener/DeleteURL"
+	UrlShortener_ListAllURLs_FullMethodName    = "/main.UrlShortener/ListAllURLs"
 )
 
 // UrlShortenerClient is the client API for UrlShortener service.
@@ -34,6 +39,16 @@ type UrlShortenerClient interface {
 	GetOriginalURL(ctx context.Context, in *GetOriginalURLRequest, opts ...grpc.CallOption) (*GetOriginalURLResponse, error)
 	// Increment click counter whenever a short link is used
 	IncrementClick(ctx context.Context, in *IncrementClickRequest, opts ...grpc.CallOption) (*IncrementClickResponse, error)
+	// ✅ New RPC: Health check endpoint
+	HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error)
+	// ✅ New RPC: Get analytics and metadata for a specific URL
+	GetURLStats(ctx context.Context, in *GetURLStatsRequest, opts ...grpc.CallOption) (*GetURLStatsResponse, error)
+	// ✅ New RPC: Update an existing short URL (change destination or expiry)
+	UpdateURL(ctx context.Context, in *UpdateURLRequest, opts ...grpc.CallOption) (*UpdateURLResponse, error)
+	// ✅ New RPC: Delete a short URL by ID
+	DeleteURL(ctx context.Context, in *DeleteURLRequest, opts ...grpc.CallOption) (*DeleteURLResponse, error)
+	// ✅ New RPC: List all shortened URLs (with optional pagination)
+	ListAllURLs(ctx context.Context, in *ListAllURLsRequest, opts ...grpc.CallOption) (*ListAllURLsResponse, error)
 }
 
 type urlShortenerClient struct {
@@ -74,6 +89,56 @@ func (c *urlShortenerClient) IncrementClick(ctx context.Context, in *IncrementCl
 	return out, nil
 }
 
+func (c *urlShortenerClient) HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HealthCheckResponse)
+	err := c.cc.Invoke(ctx, UrlShortener_HealthCheck_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *urlShortenerClient) GetURLStats(ctx context.Context, in *GetURLStatsRequest, opts ...grpc.CallOption) (*GetURLStatsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetURLStatsResponse)
+	err := c.cc.Invoke(ctx, UrlShortener_GetURLStats_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *urlShortenerClient) UpdateURL(ctx context.Context, in *UpdateURLRequest, opts ...grpc.CallOption) (*UpdateURLResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateURLResponse)
+	err := c.cc.Invoke(ctx, UrlShortener_UpdateURL_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *urlShortenerClient) DeleteURL(ctx context.Context, in *DeleteURLRequest, opts ...grpc.CallOption) (*DeleteURLResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteURLResponse)
+	err := c.cc.Invoke(ctx, UrlShortener_DeleteURL_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *urlShortenerClient) ListAllURLs(ctx context.Context, in *ListAllURLsRequest, opts ...grpc.CallOption) (*ListAllURLsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAllURLsResponse)
+	err := c.cc.Invoke(ctx, UrlShortener_ListAllURLs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UrlShortenerServer is the server API for UrlShortener service.
 // All implementations must embed UnimplementedUrlShortenerServer
 // for forward compatibility.
@@ -84,6 +149,16 @@ type UrlShortenerServer interface {
 	GetOriginalURL(context.Context, *GetOriginalURLRequest) (*GetOriginalURLResponse, error)
 	// Increment click counter whenever a short link is used
 	IncrementClick(context.Context, *IncrementClickRequest) (*IncrementClickResponse, error)
+	// ✅ New RPC: Health check endpoint
+	HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error)
+	// ✅ New RPC: Get analytics and metadata for a specific URL
+	GetURLStats(context.Context, *GetURLStatsRequest) (*GetURLStatsResponse, error)
+	// ✅ New RPC: Update an existing short URL (change destination or expiry)
+	UpdateURL(context.Context, *UpdateURLRequest) (*UpdateURLResponse, error)
+	// ✅ New RPC: Delete a short URL by ID
+	DeleteURL(context.Context, *DeleteURLRequest) (*DeleteURLResponse, error)
+	// ✅ New RPC: List all shortened URLs (with optional pagination)
+	ListAllURLs(context.Context, *ListAllURLsRequest) (*ListAllURLsResponse, error)
 	mustEmbedUnimplementedUrlShortenerServer()
 }
 
@@ -102,6 +177,21 @@ func (UnimplementedUrlShortenerServer) GetOriginalURL(context.Context, *GetOrigi
 }
 func (UnimplementedUrlShortenerServer) IncrementClick(context.Context, *IncrementClickRequest) (*IncrementClickResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IncrementClick not implemented")
+}
+func (UnimplementedUrlShortenerServer) HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HealthCheck not implemented")
+}
+func (UnimplementedUrlShortenerServer) GetURLStats(context.Context, *GetURLStatsRequest) (*GetURLStatsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetURLStats not implemented")
+}
+func (UnimplementedUrlShortenerServer) UpdateURL(context.Context, *UpdateURLRequest) (*UpdateURLResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateURL not implemented")
+}
+func (UnimplementedUrlShortenerServer) DeleteURL(context.Context, *DeleteURLRequest) (*DeleteURLResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteURL not implemented")
+}
+func (UnimplementedUrlShortenerServer) ListAllURLs(context.Context, *ListAllURLsRequest) (*ListAllURLsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAllURLs not implemented")
 }
 func (UnimplementedUrlShortenerServer) mustEmbedUnimplementedUrlShortenerServer() {}
 func (UnimplementedUrlShortenerServer) testEmbeddedByValue()                      {}
@@ -178,6 +268,96 @@ func _UrlShortener_IncrementClick_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UrlShortener_HealthCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HealthCheckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UrlShortenerServer).HealthCheck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UrlShortener_HealthCheck_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UrlShortenerServer).HealthCheck(ctx, req.(*HealthCheckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UrlShortener_GetURLStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetURLStatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UrlShortenerServer).GetURLStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UrlShortener_GetURLStats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UrlShortenerServer).GetURLStats(ctx, req.(*GetURLStatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UrlShortener_UpdateURL_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateURLRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UrlShortenerServer).UpdateURL(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UrlShortener_UpdateURL_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UrlShortenerServer).UpdateURL(ctx, req.(*UpdateURLRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UrlShortener_DeleteURL_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteURLRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UrlShortenerServer).DeleteURL(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UrlShortener_DeleteURL_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UrlShortenerServer).DeleteURL(ctx, req.(*DeleteURLRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UrlShortener_ListAllURLs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAllURLsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UrlShortenerServer).ListAllURLs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UrlShortener_ListAllURLs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UrlShortenerServer).ListAllURLs(ctx, req.(*ListAllURLsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UrlShortener_ServiceDesc is the grpc.ServiceDesc for UrlShortener service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -196,6 +376,26 @@ var UrlShortener_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "IncrementClick",
 			Handler:    _UrlShortener_IncrementClick_Handler,
+		},
+		{
+			MethodName: "HealthCheck",
+			Handler:    _UrlShortener_HealthCheck_Handler,
+		},
+		{
+			MethodName: "GetURLStats",
+			Handler:    _UrlShortener_GetURLStats_Handler,
+		},
+		{
+			MethodName: "UpdateURL",
+			Handler:    _UrlShortener_UpdateURL_Handler,
+		},
+		{
+			MethodName: "DeleteURL",
+			Handler:    _UrlShortener_DeleteURL_Handler,
+		},
+		{
+			MethodName: "ListAllURLs",
+			Handler:    _UrlShortener_ListAllURLs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
