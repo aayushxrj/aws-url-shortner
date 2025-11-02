@@ -69,10 +69,54 @@ func main() {
 		return longURL, true
 	}
 
-	http.HandleFunc("/", handlers.RedirectHandler(getLongURL))
+	// Wrap redirect handler with CORS middleware so browser preflight (OPTIONS)
+	// requests receive Access-Control-Allow-* headers. This helps when the
+	// frontend mistakenly calls the backend HTTP port directly (8080) instead
+	// of going through Envoy gRPC-Web proxy.
+	redirectHandler := handlers.RedirectHandler(getLongURL)
+	http.HandleFunc("/", corsMiddleware(redirectHandler))
 
 	fmt.Printf("HTTP redirect server is running on port %s\n", httpPort)
 	if err := http.ListenAndServe(":"+httpPort, nil); err != nil {
 		log.Fatalf("Failed to serve HTTP: %v", err)
+	}
+}
+
+// corsMiddleware sets CORS headers and handles OPTIONS preflight requests.
+// It reads the request Origin and allows it if it's in the allowed list.
+func corsMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	// allowed origins for dev -- adjust as needed or make configurable via env
+	allowed := map[string]bool{
+		"http://localhost:5173": true,
+		"http://127.0.0.1:5173": true,
+		"http://localhost:3000": true,
+		"http://127.0.0.1:3000": true,
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+		if origin == "" {
+			// no origin, just proceed
+			next(w, r)
+			return
+		}
+
+		if allowed[origin] {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Vary", "Origin")
+		}
+
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-Grpc-Web, X-User-Agent, grpc-timeout, Authorization")
+		w.Header().Set("Access-Control-Expose-Headers", "grpc-status, grpc-message")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+		if r.Method == http.MethodOptions {
+			// preflight request - respond and return
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next(w, r)
 	}
 }
