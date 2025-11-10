@@ -60,12 +60,22 @@ func main() {
 		httpPort = "8080"
 	}
 
-	// Function to query DynamoDB for a short URL
+	// Function to query DynamoDB for a short URL. It also increments the click
+	// counter asynchronously when a URL is found so redirects remain fast.
 	getLongURL := func(shortKey string) (string, bool) {
-		longURL, err := client.GetLongURL(context.Background(), shortKey)
+		ctx := context.Background()
+		longURL, err := client.GetLongURL(ctx, shortKey)
 		if err != nil || longURL == "" {
 			return "", false
 		}
+
+		// increment click count in background; log error if it fails
+		go func(k string) {
+			if err := client.IncrementClick(ctx, k); err != nil {
+				log.Printf("failed to increment click for %s: %v", k, err)
+			}
+		}(shortKey)
+
 		return longURL, true
 	}
 

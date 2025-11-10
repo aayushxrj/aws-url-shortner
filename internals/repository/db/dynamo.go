@@ -80,3 +80,24 @@ func (c *DynamoClient) GetLongURL(ctx context.Context, shortKey string) (string,
 	}
 	return data.OriginalUrl, nil
 }
+
+// IncrementClick increments the click counter for a short URL in the Urls table.
+// This is safe to call when a redirect occurs.
+func (c *DynamoClient) IncrementClick(ctx context.Context, shortKey string) error {
+	_, err := c.DB.UpdateItem(ctx, &dynamodb.UpdateItemInput{
+		TableName: aws.String("Urls"),
+		Key: map[string]types.AttributeValue{
+			"short_id": &types.AttributeValueMemberS{Value: shortKey},
+		},
+		// Use if_not_exists to initialize clicks to 0 if the attribute is missing
+		UpdateExpression: aws.String("SET clicks = if_not_exists(clicks, :zero) + :incr"),
+		ExpressionAttributeValues: map[string]types.AttributeValue{
+			":zero": &types.AttributeValueMemberN{Value: "0"},
+			":incr": &types.AttributeValueMemberN{Value: "1"},
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("failed to increment clicks: %w", err)
+	}
+	return nil
+}
