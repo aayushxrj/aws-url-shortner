@@ -14,19 +14,19 @@ service UrlShortener {
   // Increment click counter whenever a short link is used
   rpc IncrementClick (IncrementClickRequest) returns (IncrementClickResponse);
 
-  // ✅ New RPC: Health check endpoint
+  // Health check endpoint
   rpc HealthCheck (HealthCheckRequest) returns (HealthCheckResponse);
 
-  // ✅ New RPC: Get analytics and metadata for a specific URL
+  // Get analytics and metadata for a specific URL
   rpc GetURLStats (GetURLStatsRequest) returns (GetURLStatsResponse);
 
-  // ✅ New RPC: Update an existing short URL (change destination or expiry)
+  // Update an existing short URL (change destination or expiry)
   rpc UpdateURL (UpdateURLRequest) returns (UpdateURLResponse);
 
-  // ✅ New RPC: Delete a short URL by ID
+  // Delete a short URL by ID
   rpc DeleteURL (DeleteURLRequest) returns (DeleteURLResponse);
 
-  // ✅ New RPC: List all shortened URLs (with optional pagination)
+  // List all shortened URLs (with optional pagination)
   rpc ListAllURLs (ListAllURLsRequest) returns (ListAllURLsResponse);
 }
 
